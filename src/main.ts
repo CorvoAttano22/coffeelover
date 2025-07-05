@@ -8,9 +8,13 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      forbidNonWhitelisted: true
+      forbidNonWhitelisted: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
+  app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3000);
 }
 
