@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { CoffeesModule } from './coffees/coffees.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodModule } from './food/food.module';
+import { UsersModule } from './users/users.module';
+import { IamModule } from './iam/iam.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -24,6 +26,8 @@ import { FoodModule } from './food/food.module';
       synchronize: true, //notForProduction
     }),
     FoodModule,
+    UsersModule,
+    IamModule,
   ],
   controllers: [AppController],
   providers: [AppService],

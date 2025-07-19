@@ -3,7 +3,7 @@ import { FoodService } from './food.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
 
-@Controller('food')
+@Controller('foods')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
 
