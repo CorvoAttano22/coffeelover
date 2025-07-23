@@ -8,11 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FoodModule } from './food/food.module';
 import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    ConfigModule.forRoot(),
     CoffeesModule,
     FoodModule,
     TypeOrmModule.forRoot({
