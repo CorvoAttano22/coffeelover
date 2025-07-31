@@ -2,7 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { FoodService } from './food.service';
 import { CreateFoodDto } from './dto/create-food.dto';
 import { UpdateFoodDto } from './dto/update-food.dto';
+import { AuthType } from 'src/iam/enums/auth-type.enum';
+import { Auth } from 'src/iam/decorators/auth.decorator';
 
+@Auth(AuthType.None)
 @Controller('foods')
 export class FoodController {
   constructor(private readonly foodService: FoodService) {}
