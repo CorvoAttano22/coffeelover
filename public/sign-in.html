@@ -139,54 +139,32 @@
       <div class="container">
         <div class="row">
           <div class="col-xl-8 ftco-animate">
-            <form id="signupForm" class="billing-form ftco-bg-dark p-3 p-md-5">
-              <h3 class="mb-4 billing-heading">Sign Up</h3>
+            <form action="#" class="billing-form ftco-bg-dark p-3 p-md-5">
+              <h3 class="mb-4 billing-heading">Sign In</h3>
+
+             
+
+              
 
               <div class="row align-items-end">
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input
-                      id="email"
-                      type="email"
-                      class="form-control"
-                      name="email"
-                      placeholder=""
-                      required
-                    />
+                    <label for="firstname">Email Address</label>
+                    <input type="text" class="form-control" placeholder="" />
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                      id="password"
-                      type="password"
-                      class="form-control"
-                      name="password"
-                      placeholder=""
-                      required
-                    />
+                    <label for="lastname">Password</label>
+                    <input type="password" class="form-control" placeholder=""  />
                   </div>
                 </div>
-                <div class="w-100"></div>
-                <div class="col-md-12"></div>
-                <div class="w-100"></div>
                 <div class="w-100"></div>
                 <div class="col-md-12">
-                  <div class="form-group mt-4">
-                    <div class="radio">
-                      <label class="mr-3"
-                        ><input type="radio" name="optradio" /> Already have an
-                        Account?
-                      </label>
-                    </div>
-                  </div>
                 </div>
+                <div class="w-100"></div>
+                <div class="w-100"></div>
               </div>
-              <button type="submit" class="btn btn-primary mt-3">
-                Sign Up
-              </button>
             </form>
             <!-- END -->
 
@@ -532,57 +510,6 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="js/google-map.js"></script>
     <script src="js/main.js"></script>
-
-    <script>
-      const form = document.getElementById('signupForm');
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = form.querySelector('input[name="email"]').value.trim();
-        const password = form.querySelector('input[name="password"]').value;
-
-        if (!email) {
-          alert('Email is required.');
-          return;
-        }
-        if (password.length < 10) {
-          alert('Password must be at least 10 characters.');
-          return;
-        }
-
-        try {
-          const res = await fetch(
-            'http://localhost:3000/api/authentication/sign-up',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password }),
-            },
-          );
-
-          if (!res.ok) {
-            // Read response safely
-            let errorMsg;
-            try {
-              const errData = await res.json();
-              errorMsg = errData.message || 'Request failed';
-            } catch {
-              errorMsg = await res.text();
-            }
-            throw new Error(errorMsg);
-          }
-
-          const data = await res.json();
-          console.log('Response from backend:', data);
-          alert('Sign-up successful! You can now log in.');
-          form.reset();
-        } catch (err) {
-          console.error('Error:', err);
-          alert('Error: ' + err.message);
-        }
-      });
-    </script>
 
     <script>
       $(document).ready(function () {

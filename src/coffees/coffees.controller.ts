@@ -15,12 +15,10 @@ import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto/pagination-query.dto';
 import { ActiveUser } from 'src/iam/decorators/active-user.decorator';
 import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
-import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
-import { Role } from 'src/users/enums/role.enum';
 import { Auth } from 'src/iam/decorators/auth.decorator';
 import { AuthType } from 'src/iam/enums/auth-type.enum';
 
-@Auth(AuthType.Bearer, AuthType.ApiKey)
+@Auth(AuthType.Bearer)
 @Controller('coffees')
 export class CoffeesController {
   constructor(private readonly coffeeService: CoffeesService) {}
