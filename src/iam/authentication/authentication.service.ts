@@ -49,9 +49,12 @@ export class AuthenticationService {
   }
 
   async signIn(signInDto: SignInDto) {
-    const user = await this.userRepository.findOneBy({
-      email: signInDto.email,
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password') //explicitly include password
+      .where('user.email = :email', { email: signInDto.email })
+      .getOne();
+
     if (!user) {
       throw new UnauthorizedException('User does not exists');
     }
@@ -84,7 +87,7 @@ export class AuthenticationService {
       refreshToken,
     };
   }
-
+  
   async refreshTokens(refreshTokenDto: RefreshTokenDto) {
     try {
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<

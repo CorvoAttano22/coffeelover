@@ -175,10 +175,9 @@
                 <div class="w-100"></div>
                 <div class="col-md-12">
                   <div class="form-group mt-4">
-                    <div class="radio">
+                    <div class="link">
                       <label class="mr-3"
-                        ><input type="radio" name="optradio" /> Already have an
-                        Account?
+                        ><span class="mr-2"><a href="sign-in.html">Already have an account?</a></span>
                       </label>
                     </div>
                   </div>
@@ -533,56 +532,7 @@
     <script src="js/google-map.js"></script>
     <script src="js/main.js"></script>
 
-    <script>
-      const form = document.getElementById('signupForm');
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = form.querySelector('input[name="email"]').value.trim();
-        const password = form.querySelector('input[name="password"]').value;
-
-        if (!email) {
-          alert('Email is required.');
-          return;
-        }
-        if (password.length < 10) {
-          alert('Password must be at least 10 characters.');
-          return;
-        }
-
-        try {
-          const res = await fetch(
-            'http://localhost:3000/api/authentication/sign-up',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, password }),
-            },
-          );
-
-          if (!res.ok) {
-            // Read response safely
-            let errorMsg;
-            try {
-              const errData = await res.json();
-              errorMsg = errData.message || 'Request failed';
-            } catch {
-              errorMsg = await res.text();
-            }
-            throw new Error(errorMsg);
-          }
-
-          const data = await res.json();
-          console.log('Response from backend:', data);
-          alert('Sign-up successful! You can now log in.');
-          form.reset();
-        } catch (err) {
-          console.error('Error:', err);
-          alert('Error: ' + err.message);
-        }
-      });
-    </script>
+   <script type="module" src="./js/signup.js"></script>
 
     <script>
       $(document).ready(function () {

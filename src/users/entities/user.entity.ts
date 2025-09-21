@@ -10,8 +10,7 @@ export class User {
   @Index()
   email: string;
 
-  //add password select security
-  @Column({ nullable: true })
+  @Column({ select: false })
   password: string;
 
   @Column({ type: 'enum', enum: Role, default: Role.Regular })
