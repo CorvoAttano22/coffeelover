@@ -5,10 +5,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoffeesModule } from './coffees/coffees.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FoodModule } from './food/food.module';
 import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
 import { ConfigModule } from '@nestjs/config';
+import { CartModule } from './shopping/cart/cart.module';
+import { OrderModule } from './shopping/order/order.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -16,20 +17,20 @@ import { ConfigModule } from '@nestjs/config';
     }),
     ConfigModule.forRoot(),
     CoffeesModule,
-    FoodModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'pass123',
-      database: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       autoLoadEntities: true,
-      synchronize: true, //notForProduction
+      synchronize: false, //true is notForProduction
     }),
-    FoodModule,
     UsersModule,
     IamModule,
+    CartModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

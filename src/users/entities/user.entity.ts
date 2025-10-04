@@ -1,5 +1,12 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from '../enums/role.enum';
+import { Cart } from 'src/shopping/cart/entities/cart.entity';
 
 @Entity()
 export class User {
@@ -15,4 +22,7 @@ export class User {
 
   @Column({ type: 'enum', enum: Role, default: Role.Regular })
   role: Role;
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  cartItems: Cart[];
 }
