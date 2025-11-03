@@ -25,7 +25,7 @@ import { OrderModule } from './shopping/order/order.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      synchronize: false, //true is notForProduction
+      synchronize: true, //true is notForProduction
     }),
     UsersModule,
     IamModule,

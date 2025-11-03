@@ -1,19 +1,14 @@
 import { Coffee } from './coffee.entity';
-import {
-  Column,
-  Entity,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Flavor {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
-  @ManyToMany(type => Coffee, coffee => coffee.flavor)
+  @ManyToMany((type) => Coffee, (coffee) => coffee.flavors)
   coffees: Coffee[];
 }

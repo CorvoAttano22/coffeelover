@@ -8,35 +8,41 @@ import {
 } from 'typeorm';
 import { Flavor } from './flavor.entity';
 import { Cart } from 'src/shopping/cart/entities/cart.entity';
+import { CoffeeVariant } from './coffee-variant.entity';
 
 @Entity()
 export class Coffee {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //change brand to name, but also keep the brand field?
   @Column()
+  name: string;
+
+  @Column({ nullable: true })
   brand: string;
 
-  //newly added
   @Column({ nullable: true })
   description: string;
 
   @Column({ default: 0 })
   recommendations: number;
 
-  @Column('decimal', { precision: 5, scale: 2, nullable: true }) //to be changed to required
-  price: number;
-
-  //newly added
-  @Column({ nullable: true })
+  @Column()
   image: string;
+
+  @Column({ default: true })
+  isAvailable: boolean;
 
   @JoinTable()
   @ManyToMany((type) => Flavor, (flavor) => flavor.coffees, {
     cascade: true,
   })
-  flavor: Flavor[];
+  flavors: Flavor[];
+
+  @OneToMany(() => CoffeeVariant, (variant) => variant.coffee, {
+    cascade: true,
+  })
+  variants: CoffeeVariant[];
 
   @OneToMany(() => Cart, (cart) => cart.coffee)
   cartItems: Cart[];
