@@ -7,12 +7,15 @@ import { UpdateCoffeeDto } from './dto/update-coffee.dto';
 import { Flavor } from './entities/flavor.entity';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto/pagination-query.dto';
 import { Event } from 'src/events/entities/event.entity/event.entity';
+import { CoffeeVariant } from './entities/coffee-variant.entity';
 
 @Injectable()
 export class CoffeesService {
   constructor(
     @InjectRepository(Coffee)
     private readonly coffeeRepository: Repository<Coffee>,
+    @InjectRepository(CoffeeVariant)
+    private readonly variantRepository: Repository<CoffeeVariant>,
     @InjectRepository(Flavor)
     private readonly flavorRepository: Repository<Flavor>,
     private readonly connection: DataSource,
@@ -21,7 +24,7 @@ export class CoffeesService {
   async findAll(paginationQuery: PaginationQueryDto) {
     const { limit, offset } = paginationQuery;
     return await this.coffeeRepository.find({
-      relations: ['flavor'],
+      relations: ['flavors', 'variants'],
       skip: offset,
       take: limit,
     });
@@ -30,7 +33,7 @@ export class CoffeesService {
   async findOne(id: string) {
     const coffee = await this.coffeeRepository.findOne({
       where: { id: +id },
-      relations: ['flavor'],
+      relations: ['flavors', 'variants'],
     });
     if (!coffee) {
       throw new NotFoundException('Coffee not found!');
@@ -38,33 +41,114 @@ export class CoffeesService {
     return coffee;
   }
 
-  async create(createCoffeeDto: CreateCoffeeDto) {
-    const flavor = await Promise.all(
-      createCoffeeDto.flavor.map((name) => this.preloadFlavorByName(name)),
+ async create(createCoffeeDto: CreateCoffeeDto) {
+  //Handling flavors
+  let flavors: Flavor[] = [];
+  if (createCoffeeDto.flavors?.length) {
+    flavors = await Promise.all(
+      createCoffeeDto.flavors.map(name => this.preloadFlavorByName(name)),
     );
-
-    const coffee = this.coffeeRepository.create({
-      ...createCoffeeDto,
-      flavor,
-    });
-    return this.coffeeRepository.save(coffee);
   }
 
-  async update(id: string, updateCoffeeDto: UpdateCoffeeDto) {
-    const flavor =
-      updateCoffeeDto.flavor &&
-      (await Promise.all(
-        updateCoffeeDto.flavor.map((name) => this.preloadFlavorByName(name)),
-      ));
+  //coffee
+  let coffee = this.coffeeRepository.create({
+    name: createCoffeeDto.name,
+    brand: createCoffeeDto.brand,
+    description: createCoffeeDto.description,
+    image: createCoffeeDto.image,
+    isAvailable: createCoffeeDto.isAvailable ?? true,
+    flavors,
+  });
 
+  coffee = await this.coffeeRepository.save(coffee);
+
+  //negative price prevention to be added (maybe a value object?)
+  //creating variants
+  if (createCoffeeDto.variants?.length) {
+    const variants = createCoffeeDto.variants.map(v =>
+      this.variantRepository.create({
+        weight: v.weight,
+        price: v.price,
+        inStock: v.inStock ?? true,
+        coffee,
+      }),
+    );
+    await this.variantRepository.save(variants);
+    coffee.variants = variants;
+  }
+
+  return coffee;
+}
+
+
+  async update(id: string, updateCoffeeDto: UpdateCoffeeDto) {
+    //flavor update
+    let flavors: Flavor[] | undefined = undefined;
+    if (updateCoffeeDto.flavor?.length) {
+      flavors = await Promise.all(
+        updateCoffeeDto.flavor.map((name) => this.preloadFlavorByName(name)),
+      );
+    }
+
+    //Preload coffee with updated properties
     const coffee = await this.coffeeRepository.preload({
       id: +id,
-      ...updateCoffeeDto,
-      flavor,
+      name: updateCoffeeDto.name,
+      brand: updateCoffeeDto.brand,
+      description: updateCoffeeDto.description,
+      image: updateCoffeeDto.image,
+      isAvailable: updateCoffeeDto.isAvailable,
+      flavors: flavors,
     });
+
     if (!coffee) {
       throw new NotFoundException('Coffee not found!');
     }
+
+    //variants update
+    if (updateCoffeeDto.variants?.length) {
+     
+      const currentVariants = await this.variantRepository.find({
+        where: { coffee: { id: coffee.id } },
+      });
+
+      const variantIdsToKeep = updateCoffeeDto.variants
+        .filter((v) => v.id)
+        .map((v) => v.id);
+      const variantsToRemove = currentVariants.filter(
+        (v) => !variantIdsToKeep.includes(v.id),
+      );
+      if (variantsToRemove.length > 0) {
+        await this.variantRepository.remove(variantsToRemove);
+      }
+
+      //Preload existing and create new variants
+      coffee.variants = await Promise.all(
+        updateCoffeeDto.variants.map(async (v) => {
+          if (v.id) {
+            const existingVariant = await this.variantRepository.preload({
+              id: v.id,
+              weight: v.weight,
+              price: v.price,
+              inStock: v.inStock ?? true,
+              coffee: coffee,
+            });
+            if (!existingVariant) {
+              throw new NotFoundException(`Variant with id ${v.id} not found`);
+            }
+            return existingVariant;
+          } else {
+            return this.variantRepository.create({
+              weight: v.weight,
+              price: v.price,
+              inStock: v.inStock ?? true,
+              coffee: coffee,
+            });
+          }
+        }),
+      );
+    }
+    
     return this.coffeeRepository.save(coffee);
   }
 
@@ -73,7 +157,7 @@ export class CoffeesService {
     return this.coffeeRepository.remove(coffee);
   }
 
-//to be understood
+  //to be understood
   async recommendCoffee(coffee: Coffee) {
     const queryRunner = this.connection.createQueryRunner();
 
@@ -97,18 +181,19 @@ export class CoffeesService {
       await queryRunner.release();
     }
   }
-//
+  //
 
   private async preloadFlavorByName(name: string): Promise<Flavor> {
+    const normalized = name.trim().toLowerCase();
     const existingFlavor = await this.flavorRepository.findOne({
-      where: { name },
+      where: { name: normalized },
     });
 
     if (existingFlavor) {
       return existingFlavor;
     }
 
-    const newFlavor = this.flavorRepository.create({ name });
+    const newFlavor = this.flavorRepository.create({ name: normalized });
     return await this.flavorRepository.save(newFlavor);
   }
 }

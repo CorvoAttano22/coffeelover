@@ -1,12 +1,13 @@
 import {
   Column,
   Entity,
-  JoinTable,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role } from '../enums/role.enum';
-import { ApiKey } from '../api-keys/entities/api-key.entity/api-key.entity';
+import { Cart } from 'src/shopping/cart/entities/cart.entity';
+import { Order } from 'src/shopping/order/entities/order.entity';
 
 @Entity()
 export class User {
@@ -14,24 +15,18 @@ export class User {
   id: number;
 
   @Column({ unique: true })
+  @Index()
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ select: false })
   password: string;
 
-  @Column({ enum: Role, default: Role.Regular })
+  @Column({ type: 'enum', enum: Role, default: Role.Regular })
   role: Role;
 
-  @Column({ default: false })
-  isTfaEnabled: boolean;
+  @OneToMany(() => Cart, (cart) => cart.user)
+  cartItems: Cart[];
 
-  @Column({ nullable: true })
-  tfaSecret: string;
-
-  @Column({ nullable: true })
-  googleId: string;
-
-  @JoinTable()
-  @OneToMany((type) => ApiKey, (apiKey) => apiKey.user)
-  apiKeys: ApiKey[];
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }
