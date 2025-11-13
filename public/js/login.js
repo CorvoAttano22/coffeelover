@@ -1,4 +1,3 @@
-// login.js
 import { apiFetch } from './apiClient.js';
 
 const form = document.getElementById('loginForm');

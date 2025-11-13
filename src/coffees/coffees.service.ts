@@ -42,7 +42,7 @@ export class CoffeesService {
   }
 
  async create(createCoffeeDto: CreateCoffeeDto) {
-  // 1️⃣ Handle flavors
+  //Handling flavors
   let flavors: Flavor[] = [];
   if (createCoffeeDto.flavors?.length) {
     flavors = await Promise.all(
@@ -50,7 +50,7 @@ export class CoffeesService {
     );
   }
 
-  // 2️⃣ Create and save coffee first
+  //coffee
   let coffee = this.coffeeRepository.create({
     name: createCoffeeDto.name,
     brand: createCoffeeDto.brand,
@@ -62,7 +62,8 @@ export class CoffeesService {
 
   coffee = await this.coffeeRepository.save(coffee);
 
-  // 3️⃣ Now create variants referencing the persisted coffee
+  //negative price prevention to be added (maybe a value object?)
+  //creating variants
   if (createCoffeeDto.variants?.length) {
     const variants = createCoffeeDto.variants.map(v =>
       this.variantRepository.create({
@@ -81,7 +82,7 @@ export class CoffeesService {
 
 
   async update(id: string, updateCoffeeDto: UpdateCoffeeDto) {
-    // 1️⃣ Handle flavors if provided
+    //flavor update
     let flavors: Flavor[] | undefined = undefined;
     if (updateCoffeeDto.flavor?.length) {
       flavors = await Promise.all(
@@ -89,7 +90,7 @@ export class CoffeesService {
       );
     }
 
-    // 2️⃣ Preload coffee with updated properties
+    //Preload coffee with updated properties
     const coffee = await this.coffeeRepository.preload({
       id: +id,
       name: updateCoffeeDto.name,
@@ -104,14 +105,13 @@ export class CoffeesService {
       throw new NotFoundException('Coffee not found!');
     }
 
-    // 3️⃣ Handle variants if provided
+    //variants update
     if (updateCoffeeDto.variants?.length) {
-      // Load current variants
+     
       const currentVariants = await this.variantRepository.find({
         where: { coffee: { id: coffee.id } },
       });
 
-      // Remove variants not included in update payload
       const variantIdsToKeep = updateCoffeeDto.variants
         .filter((v) => v.id)
         .map((v) => v.id);
@@ -122,7 +122,7 @@ export class CoffeesService {
         await this.variantRepository.remove(variantsToRemove);
       }
 
-      // Preload existing and create new variants
+      //Preload existing and create new variants
       coffee.variants = await Promise.all(
         updateCoffeeDto.variants.map(async (v) => {
           if (v.id) {
@@ -138,7 +138,6 @@ export class CoffeesService {
             }
             return existingVariant;
           } else {
-            // New variant
             return this.variantRepository.create({
               weight: v.weight,
               price: v.price,
@@ -149,8 +148,7 @@ export class CoffeesService {
         }),
       );
     }
-
-    // 4️⃣ Save coffee with updated flavors and variants
+    
     return this.coffeeRepository.save(coffee);
   }
 

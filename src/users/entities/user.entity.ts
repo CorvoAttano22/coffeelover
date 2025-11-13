@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Role } from '../enums/role.enum';
 import { Cart } from 'src/shopping/cart/entities/cart.entity';
+import { Order } from 'src/shopping/order/entities/order.entity';
 
 @Entity()
 export class User {
@@ -25,4 +26,7 @@ export class User {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   cartItems: Cart[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

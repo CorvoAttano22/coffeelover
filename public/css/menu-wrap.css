@@ -1,0 +1,25 @@
+.menu-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.menu-row > [class*='col-'] {
+  display: flex;
+}
+
+.menu-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.menu-wrap .text p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  min-height: 4.5em;
+}

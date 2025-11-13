@@ -43,7 +43,4 @@ export class Coffee {
     cascade: true,
   })
   variants: CoffeeVariant[];
-
-  @OneToMany(() => Cart, (cart) => cart.coffee)
-  cartItems: Cart[];
 }

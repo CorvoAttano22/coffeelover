@@ -18,7 +18,6 @@ import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
 import { Auth } from 'src/iam/decorators/auth.decorator';
 import { AuthType } from 'src/iam/enums/auth-type.enum';
 
-@Auth(AuthType.Bearer)
 @Controller('coffees')
 export class CoffeesController {
   constructor(private readonly coffeeService: CoffeesService) {}
@@ -43,6 +42,7 @@ export class CoffeesController {
   }
 
   // @Roles(Role.Admin)
+  @Auth(AuthType.Bearer)
   @Post()
   create(@Body() createCoffeeDto: CreateCoffeeDto) {
     console.log(createCoffeeDto instanceof CreateCoffeeDto);
@@ -50,12 +50,14 @@ export class CoffeesController {
   }
 
   // @Roles(Role.Admin)
+  @Auth(AuthType.Bearer)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCoffeeDto: UpdateCoffeeDto) {
     return this.coffeeService.update(id, updateCoffeeDto);
   }
 
   // @Roles(Role.Admin)
+  @Auth(AuthType.Bearer)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.coffeeService.remove(id);

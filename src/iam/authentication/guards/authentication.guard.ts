@@ -11,7 +11,7 @@ import { AUTH_TYPE_KEY } from 'src/iam/decorators/auth.decorator';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-  private static readonly defaultAuthType = AuthType.Bearer;
+  private static readonly defaultAuthType = AuthType.None;
 
   private readonly authTypeGuardMap: Record<
     AuthType,

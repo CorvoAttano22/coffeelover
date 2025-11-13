@@ -1,4 +1,4 @@
-import { Coffee } from 'src/coffees/entities/coffee.entity';
+import { CoffeeVariant } from 'src/coffees/entities/coffee-variant.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -6,16 +6,18 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
-
+  
+  //implement the logic for guest user's cart
   @ManyToOne(() => User, (user) => user.cartItems)
-  user: User;
+  user?: User;
 
-  @ManyToOne(() => Coffee)
-  coffee: Coffee;
+  @ManyToOne(() => CoffeeVariant, { eager: true })
+  variant: CoffeeVariant;
 
   @Column({ type: 'int', default: 1 })
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  total: number;
+  get total(): number {
+    return Number(this.variant.price) * this.quantity;
+  }
 }
