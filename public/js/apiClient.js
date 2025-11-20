@@ -1,16 +1,29 @@
 export async function apiFetch(url, options = {}) {
   const fullUrl = url.startsWith('http') ? url : `http://localhost:3000${url}`;
 
-  const res = await fetch(fullUrl, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+  const token = localStorage.getItem('accessToken');
 
+  const baseHeaders = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  //token check to avoid refresh loop
+  if (token) {
+    baseHeaders['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(fullUrl, {
+    ...options,
+    headers: baseHeaders,
+  });
+  
   if (res.status === 401) {
+    if (!token) {
+      localStorage.removeItem('accessToken');
+      return res;
+    }
+
     if (
       fullUrl.includes('/sign-in') ||
       fullUrl.includes('/sign-up') ||
@@ -30,7 +43,21 @@ export async function apiFetch(url, options = {}) {
     );
 
     if (!refreshRes.ok) {
-      throw new Error('Refresh token expired. Please log in again.');
+      console.error('Failed to refresh token. Redirecting to login.');
+      localStorage.removeItem('accessToken');
+      window.location.href = '/sign-in.html';
+      return refreshRes;
+    }
+
+    const { accessToken: newAccessToken } = await refreshRes.json();
+    if (newAccessToken) {
+      localStorage.setItem('accessToken', newAccessToken);
+      console.log('Token refreshed successfully.');
+    } else {
+      console.error('Refresh response did not contain a new access token.');
+      localStorage.removeItem('accessToken');
+      window.location.href = '/sign-in.html';
+      return refreshRes;
     }
 
     return apiFetch(url, options);
@@ -38,5 +65,3 @@ export async function apiFetch(url, options = {}) {
 
   return res;
 }
-
-//add redirect to login in case of no token
