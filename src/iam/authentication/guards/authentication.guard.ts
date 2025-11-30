@@ -15,7 +15,9 @@ export class AuthenticationGuard implements CanActivate {
 
   private readonly authTypeGuardMap: Record<
     AuthType,
-    CanActivate | CanActivate[]
+    | CanActivate
+    | CanActivate[]
+    | { canActivate: (context: ExecutionContext) => Promise<boolean> }
   >;
 
   constructor(
@@ -24,7 +26,16 @@ export class AuthenticationGuard implements CanActivate {
   ) {
     this.authTypeGuardMap = {
       [AuthType.Bearer]: this.accessTokenGuard,
-      [AuthType.None]: { canActivate: () => true },
+      [AuthType.None]: {
+        canActivate: async (context: ExecutionContext) => {
+          try {
+            await this.accessTokenGuard.canActivate(context);
+          } catch (err) {
+            // This route is public, so we just proceed as a guest.
+          }
+          return true;
+        },
+      },
     };
   }
 
@@ -33,6 +44,7 @@ export class AuthenticationGuard implements CanActivate {
       AUTH_TYPE_KEY,
       [context.getHandler(), context.getClass()],
     ) ?? [AuthenticationGuard.defaultAuthType];
+
     const guards = authTypes.map((type) => this.authTypeGuardMap[type]).flat();
     let error = new UnauthorizedException();
 
@@ -42,6 +54,7 @@ export class AuthenticationGuard implements CanActivate {
       ).catch((err) => {
         error = err;
       });
+
       if (canActivate) {
         return true;
       }

@@ -1,50 +1,94 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCartDto } from './dto/create-cart.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cart} from './entities/cart.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Coffee } from 'src/coffees/entities/coffee.entity';
+import { Cart } from './entities/cart.entity';
+import { AddCartItemDto } from './dto/add-cart-item.dto';
+import { CoffeeVariant } from 'src/coffees/entities/coffee-variant.entity';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepository: Repository<Cart>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Coffee)
-    private readonly coffeeRepository: Repository<Coffee>,
+    @InjectRepository(CoffeeVariant)
+    private readonly variantRepository: Repository<CoffeeVariant>,
   ) {}
 
-  //     async addItem(userId: number, dto: CreateCartDto) {
-  //     const { productType, productId, quantity } = dto;
+  async addToCart(
+    authIdentifier: { userId?: number; guestId?: string },
+    itemDto: AddCartItemDto,
+  ): Promise<Cart> {
+    const { variantId, quantity } = itemDto;
 
-  //     // ✅ Fetch product from ProductService
-  //     const product = await this.foodRepository.findBy({});
-  //     if (!product) throw new NotFoundException('Product not found');
+    const variant = await this.variantRepository.findOne({
+      where: { id: variantId },
+      relations: ['coffee'],
+    });
 
-  //     const price = product.price;
-  //     const total = price * quantity;
+    if (!variant) {
+      throw new NotFoundException(
+        `Coffee variant with ID ${variantId} not found.`,
+      );
+    }
+    if (!variant.inStock) {
+      throw new BadRequestException(`Variant is currently out of stock.`);
+    }
 
-  //     // ✅ Check if already in cart
-  //     let cartItem = await this.cartRepository.findOne({
-  //       where: { user: { id: userId }, productType, productId },
-  //     });
+    const cartOwnerWhere = {};
+    if (authIdentifier.userId) {
+      cartOwnerWhere['user'] = { id: authIdentifier.userId };
+      cartOwnerWhere['guestId'] = null;
+    } else if (authIdentifier.guestId) {
+      cartOwnerWhere['guestId'] = authIdentifier.guestId;
+      cartOwnerWhere['user'] = null;
+    } else {
+      throw new BadRequestException(
+        'Cannot add to cart without a valid user or guest ID.',
+      );
+    }
 
-  //     if (cartItem) {
-  //       cartItem.quantity += quantity;
-  //       cartItem.total = cartItem.quantity * price;
-  //     } else {
-  //       cartItem = this.cartRepository.create({
-  //         user: { id: userId },
-  //         productType,
-  //         productId,
-  //         quantity,
-  //         total,
-  //       });
-  //     }
+    const existingItem = await this.cartRepository.findOne({
+      where: {
+        ...cartOwnerWhere,
+        variant: { id: variantId },
+      },
+    });
 
-  //     return this.cartRepository.save(cartItem);
-  //   }
+    if (existingItem) {
+      existingItem.quantity += quantity;
+      return this.cartRepository.save(existingItem);
+    } else {
+      const ownershipFields = authIdentifier.userId
+        ? { user: { id: authIdentifier.userId }, guestId: undefined }
+        : { guestId: authIdentifier.guestId, user: undefined };
+
+      const newCartItem = this.cartRepository.create({
+        ...ownershipFields,
+        variant: variant,
+        quantity: quantity,
+      });
+
+      return this.cartRepository.save(newCartItem);
+    }
+  }
+
+  async getCart(authIdentifier: {
+    userId?: number;
+    guestId?: string;
+  }): Promise<Cart[]> {
+    const ownerQuery = authIdentifier.userId
+      ? { user: { id: authIdentifier.userId } }
+      : { guestId: authIdentifier.guestId };
+
+    return this.cartRepository.find({
+      where: ownerQuery,
+      relations: ['variant', 'variant.coffee', 'user'],
+    });
+  }
+
+  // other methods to be added (update cart and ...)
 }

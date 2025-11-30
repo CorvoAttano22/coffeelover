@@ -1,4 +1,4 @@
-import { apiFetch } from './apiClient.js';
+import { apiFetch, deleteCookie } from './apiClient.js';
 
 const form = document.getElementById('loginForm');
 
@@ -20,10 +20,17 @@ form.addEventListener('submit', async (e) => {
     }
 
     const data = await res.json();
-    console.log('Response:', data);
 
-    alert('Login successful!');
-    form.reset();
+    if (data.accessToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+      deleteCookie('guest_id');
+      
+      alert('Login successful!');
+      form.reset();
+      window.location.href = '/index.html'; 
+    } else {
+      throw new Error('Access token not found in response');
+    }
   } catch (err) {
     console.error('Error:', err);
     alert('Error: ' + err.message);

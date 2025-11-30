@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -16,6 +17,8 @@ import { RefreshTokenDto } from './dto/refresh.token.dto';
 import { Response } from 'express';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from '../config/jwt.config';
+import { ActiveUser } from '../decorators/active-user.decorator';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
 @Auth(AuthType.None)
 @Controller('authentication')
 export class AuthenticationController {
@@ -39,13 +42,13 @@ export class AuthenticationController {
   ) {
     const tokens = await this.authService.signIn(signInDto);
 
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      //just placeholder for env stat
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: this.jwtConfiguration.accessTokenTtl * 1000, // 15 min
-    });
+    //using local storage instead for bearer token
+    // res.cookie('accessToken', tokens.accessToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'lax',
+    //   maxAge: this.jwtConfiguration.accessTokenTtl * 1000, // 15 min
+    // });
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
@@ -61,9 +64,30 @@ export class AuthenticationController {
     };
   }
 
+  @Auth(AuthType.Bearer)
+  @Post('logout')
+  async logout(
+    @ActiveUser() user: ActiveUserData,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.logout(user);
+
+    response.clearCookie('refreshToken', {
+      httpOnly: true,
+      //just placeholder for env stat
+      secure: process.env.NODE_ENV === 'production',
+    });
+  }
+
   @HttpCode(HttpStatus.OK)
   @Post('refresh-tokens')
   refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshTokens(refreshTokenDto);
+  }
+
+  @Auth(AuthType.Bearer)
+  @Get('me')
+  getProfile(@ActiveUser() user: ActiveUserData) {
+    return user;
   }
 }

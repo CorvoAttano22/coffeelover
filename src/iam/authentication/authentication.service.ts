@@ -87,7 +87,7 @@ export class AuthenticationService {
       refreshToken,
     };
   }
-  
+
   async refreshTokens(refreshTokenDto: RefreshTokenDto) {
     try {
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<
@@ -132,5 +132,9 @@ export class AuthenticationService {
         expiresIn,
       },
     );
+  }
+
+  async logout(user: ActiveUserData): Promise<void> {
+    await this.refreshTokenIdsStorage.invalidate(user.sub);
   }
 }

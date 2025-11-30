@@ -6,10 +6,13 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   //implement the logic for guest user's cart
   @ManyToOne(() => User, (user) => user.cartItems)
-  user?: User;
+  user: User;
+
+  @Column({ nullable: true })
+  guestId?: string;
 
   @ManyToOne(() => CoffeeVariant, { eager: true })
   variant: CoffeeVariant;
