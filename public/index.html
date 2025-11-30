@@ -148,7 +148,7 @@
               </p>
               <p>
                 <a
-                  href="#"
+                  href="./menu.html"
                   class="btn btn-primary btn-outline-primary px-4 py-3"
                   >View Full Menu</a
                 >
@@ -719,31 +719,6 @@
     <script src="js/jquery.timepicker.min.js"></script>
     <script src="js/scrollax.min.js"></script>
     <script src="js/main.js"></script>
-    <script type="module" src="js/apiClient.js"></script>
-    <script type="module" src="js/user.js"></script>
-    <script type="module" src="js/logout.js"></script>
-    <script type="module">
-      import { checkUserStatus } from './js/user.js';
-      import { setupLogoutHandler } from './js/logout.js';
-
-      async function loadNavbar() {
-        const navbarPlaceholder = document.getElementById('navbar-placeholder');
-        if (!navbarPlaceholder) return;
-
-        try {
-          const res = await fetch('navbar.html');
-          const html = await res.text();
-
-          navbarPlaceholder.innerHTML = html;
-
-          checkUserStatus();
-          setupLogoutHandler();
-        } catch (error) {
-          console.error('Error loading navbar or setting up handlers:', error);
-        }
-      }
-
-      loadNavbar();
-    </script>
+    <script type="module" src="js/master.js"></script>
   </body>
 </html>

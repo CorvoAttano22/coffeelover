@@ -1,4 +1,4 @@
-import { apiFetch } from './apiClient.js';
+import { apiFetch, deleteCookie } from './apiClient.js';
 
 const form = document.getElementById('loginForm');
 
@@ -23,7 +23,8 @@ form.addEventListener('submit', async (e) => {
 
     if (data.accessToken) {
       localStorage.setItem('accessToken', data.accessToken);
-
+      deleteCookie('guest_id');
+      
       alert('Login successful!');
       form.reset();
       window.location.href = '/index.html'; 
