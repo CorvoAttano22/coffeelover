@@ -31,6 +31,6 @@ export class CoffeeVariant {
   @Column('decimal', { precision: 5, scale: 2 })
   price: number;
 
-  @Column({ default: true })
-  inStock: boolean;
+  @Column({ type: 'int', default: 50 })
+  inStock: number;
 }

@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
-import { CoffeeVariant } from 'src/coffees/entities/coffee-variant.entity';
 
 @Entity({ name: 'order_items' })
 export class OrderItem {
@@ -15,8 +14,14 @@ export class OrderItem {
   @ManyToOne(() => Order, (order) => order.items)
   order: Order;
 
-  @ManyToOne(() => CoffeeVariant, { eager: true })
-  variant: CoffeeVariant;
+  @Column()
+  variantId: number;
+
+  @Column()
+  productName: string;
+
+  @Column()
+  variantDescription: string;
 
   @Column({ type: 'int' })
   quantity: number;
