@@ -1,8 +1,7 @@
 <!doctype html>
 <html lang="en">
-
   <head>
-    <title>Coffee - Free Bootstrap 4 Template by Colorlib</title>
+    <title>Checkout - Coffee Lover</title>
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -55,153 +54,130 @@
           >
             <div class="col-md-7 col-sm-12 text-center ftco-animate">
               <h1 class="mb-3 mt-5 bread">Checkout</h1>
+                <p class="breadcrumbs">
+                <span class="mr-2"><a href="index.html">Home</a></span>
+                <span class="mr-2"><a href="cart.html">Cart</a></span>
+              </p>
             </div>
           </div>
         </div>
       </div>
     </section>
-
     <section class="ftco-section">
-  <div class="container">
-    <div class="row justify-content-center"> <div class="col-xl-7 ftco-animate">
-        <form action="#" class="billing-form ftco-bg-dark p-3 p-md-5" id="checkout-form">
-          <h3 class="mb-4 billing-heading">Billing Details</h3>
-          <div class="row align-items-end">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="firstname">First Name</label>
-                <input type="text" class="form-control" id="firstname" required />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="lastname">Last Name</label>
-                <input type="text" class="form-control" id="lastname" required />
-              </div>
-            </div>
-            
-            <div class="w-100"></div>
-            
-            <div class="col-md-12">
-              <div class="form-group">
-                <label for="country">State / Country</label>
-                <input type="text" class="form-control" id="country" placeholder="e.g. France" required />
-              </div>
-            </div>
-            
-            <div class="w-100"></div>
-            
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="streetaddress">Street Address</label>
-                <input type="text" class="form-control" id="street" placeholder="House number and street name" required />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="text" class="form-control" id="apartment" placeholder="Appartment, suite, unit etc: (optional)" />
-              </div>
-            </div>
-            
-            <div class="w-100"></div>
-            
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="towncity">Town / City</label>
-                <input type="text" class="form-control" id="city" required />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="postcodezip">Postcode / ZIP *</label>
-                <input type="text" class="form-control" id="postalCode" required />
-              </div>
-            </div>
-            
-            <div class="w-100"></div>
-            
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="text" class="form-control" id="phone" required />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="emailaddress">Email Address</label>
-                <input type="text" class="form-control" id="email" required />
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <div class="col-xl-5">
-        <div class="row mt-5 pt-3">
-          <div class="col-md-12 d-flex">
-            <div class="cart-detail cart-total ftco-bg-dark p-3 p-md-4">
-              <h3 class="billing-heading mb-4">Cart Total</h3>
-              <p class="d-flex">
-                <span>Subtotal</span>
-                <span id="checkout-subtotal">$0.00</span>
-              </p>
-              <p class="d-flex">
-                <span>Delivery</span>
-                <span>$0.00</span>
-              </p>
-              <p class="d-flex">
-                <span>Discount</span>
-                <span>$0.00</span>
-              </p>
-              <hr />
-              <p class="d-flex total-price">
-                <span>Total</span>
-                <span id="checkout-total">$0.00</span>
-              </p>
-            </div>
-          </div>
-          
-          <div class="col-md-12">
-            <div class="cart-detail ftco-bg-dark p-3 p-md-4">
-              <h3 class="billing-heading mb-4">Payment</h3>
-              <div class="form-group">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-xl-7 ftco-animate">
+            <form action="#" class="billing-form ftco-bg-dark p-3 p-md-5" id="checkout-form">
+              <h3 class="mb-4 billing-heading">Billing Details / Shipping Address</h3>
+              <div class="row align-items-end">
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="firstname">First Name</label>
+                    <input type="text" class="form-control" id="firstname" name="firstName" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="lastname">Last Name</label>
+                    <input type="text" class="form-control" id="lastname" name="lastName" required />
+                  </div>
+                </div>
+                
+                <div class="w-100"></div>
+                
                 <div class="col-md-12">
-                   <p>You will be redirected to Stripe to complete your secure payment.</p>
+                  <div class="form-group">
+                    <label for="state">State / Province</label>
+                    <input type="text" class="form-control" id="state" name="state" placeholder="e.g. New York" required />
+                  </div>
+                </div>
+                
+                <div class="w-100"></div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="street">Street Address</label>
+                    <input type="text" class="form-control" id="street" name="street" placeholder="House number and street name" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="apartment" placeholder="Apartment, suite, unit etc: (optional)" />
+                  </div>
+                </div>
+                
+                <div class="w-100"></div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="city">Town / City</label>
+                    <input type="text" class="form-control" id="city" name="city" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="postalCode">Postcode / ZIP *</label>
+                    <input type="text" class="form-control" id="postalCode" name="postalCode" required />
+                  </div>
+                </div>
+                
+                <div class="w-100"></div>
+                
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" required />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="text" class="form-control" id="email" name="email" required />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-xl-5">
+            <div class="row mt-5 pt-3">
+              <div class="col-md-12 d-flex">
+                <div class="cart-detail cart-total ftco-bg-dark p-3 p-md-4">
+                  <h3 class="billing-heading mb-4">Cart Total</h3>
+                  <p class="d-flex"><span>Subtotal</span><span id="checkout-subtotal">$0.00</span></p>
+                  <p class="d-flex"><span>Delivery</span><span>$0.00</span></p>
+                  <p class="d-flex"><span>Discount</span><span>$0.00</span></p>
+                  <hr />
+                  <p class="d-flex total-price"><span>Total</span><span id="checkout-total">$0.00</span></p>
                 </div>
               </div>
               
-              <p>
-                <a href="#" class="btn btn-primary py-3 px-4 w-100" id="place-order-btn">Proceed to Pay</a>
-              </p>
+              <div class="col-md-12">
+                <div class="cart-detail ftco-bg-dark p-3 p-md-4">
+                  <h3 class="billing-heading mb-4">Payment</h3>
+                  <div class="form-group">
+                    <div class="col-md-12">
+                      <p>You will be redirected to Stripe to complete your secure payment.</p>
+                    </div>
+                  </div>
+                  
+                  <p>
+                    <button type="submit" form="checkout-form" class="btn btn-primary py-3 px-4 w-100" id="payment-button">
+                      Proceed to Pay
+                    </button>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div> </div>
-  </div>
-</section>
-
-    <!-- loader -->
+      </div>
+    </section>
     <div id="ftco-loader" class="show fullscreen">
       <svg class="circular" width="48px" height="48px">
-        <circle
-          class="path-bg"
-          cx="24"
-          cy="24"
-          r="22"
-          fill="none"
-          stroke-width="4"
-          stroke="#eeeeee"
-        />
-        <circle
-          class="path"
-          cx="24"
-          cy="24"
-          r="22"
-          fill="none"
-          stroke-width="4"
-          stroke-miterlimit="10"
-          stroke="#F96D00"
-        />
+        <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+        <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00" />
       </svg>
     </div>
 
@@ -220,6 +196,7 @@
     <script src="js/jquery.timepicker.min.js"></script>
     <script src="js/scrollax.min.js"></script>
     <script src="js/main.js"></script>
-    <script type="module" src="js/master.js"></script>
+      <script type="module" src="js/master.js"></script>
+    <script src="js/checkout.js"></script>
   </body>
 </html>

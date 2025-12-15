@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { Coffee } from './coffee.entity';
+import { OrderItem } from 'src/shopping/order/entities/order.item.entity';
 
 export enum WeightOption {
   SMALL_250G = 250,
@@ -33,4 +35,7 @@ export class CoffeeVariant {
 
   @Column({ type: 'int', default: 50 })
   inStock: number;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.variant)
+  orderItems: OrderItem[];
 }
