@@ -26,11 +26,119 @@ function showAlert(message, type) {
   }, 3000);
 }
 
+async function handleRemoveItem(itemId) {
+  try {
+    const response = await apiFetch(`/api/cart/${itemId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      let message = 'Failed to remove item from cart.';
+      try {
+        const errorData = await response.json();
+        message = errorData.message || message;
+      } catch (e) {}
+      throw new Error(message);
+    }
+
+    const cartData = await response.json(); 
+
+    renderCartTable(cartData);
+    
+    updateCartIcon(cartData.meta.totalQuantity); 
+
+    showAlert('Item removed successfully.', 'success');
+  } catch (error) {
+    console.error('Remove Item Error:', error);
+    showAlert(error.message, 'error');
+  }
+}
+
 //
-export async function loadCartPage() {
+function renderCartTable(data) {
   const tableBody = document.getElementById('cart-table-body');
   const subtotalEl = document.getElementById('cart-subtotal');
   const totalEl = document.getElementById('cart-total');
+
+  if (!tableBody || !subtotalEl || !totalEl) return;
+
+  const items = data.items;
+  const meta = data.meta;
+
+  if (items.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="6">Your cart is empty. <a href="/menu.html">Start shopping!</a></td></tr>';
+    subtotalEl.textContent = '$0.00';
+    totalEl.textContent = '$0.00';
+    return;
+  }
+
+  tableBody.innerHTML = items.map(item => {
+    const price = Number(item.variant.price);
+    const total = price * item.quantity;
+    const coffeeName = item.variant.coffee.name;
+    const image = item.variant.coffee.image || 'images/menu-1.jpg';
+    const weight = item.variant.weight;
+
+    return `
+      <tr class="text-center" data-cart-item-id="${item.id}">
+        <td class="product-remove">
+          <a href="#" class="remove-btn" data-id="${item.id}"><span class="icon-close"></span></a>
+        </td>
+        
+        <td class="image-prod">
+          <div class="img" style="background-image: url(${image});"></div>
+        </td>
+        
+        <td class="product-name">
+          <h3>${coffeeName}</h3>
+          <p>${weight}g Package</p>
+        </td>
+        
+        <td class="price">$${price.toFixed(2)}</td>
+        
+        <td class="quantity">
+          <div class="input-group mb-3">
+            <input type="text" name="quantity" 
+                   class="quantity form-control input-number" 
+                   value="${item.quantity}" min="1" max="100" readonly>
+          </div>
+        </td>
+        
+        <td class="total">$${total.toFixed(2)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const grandTotalFormatted = `$${Number(meta.grandTotal).toFixed(2)}`;
+  subtotalEl.textContent = grandTotalFormatted;
+  totalEl.textContent = grandTotalFormatted;
+
+  attachRemoveListeners();
+}
+//
+
+//
+function attachRemoveListeners() {
+  document.querySelectorAll('.remove-btn').forEach(button => {
+    if (button.dataset.listenerAttached) return;
+    
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      
+      const itemId = event.currentTarget.dataset.id;
+      if (itemId) {
+        await handleRemoveItem(parseInt(itemId));
+      }
+    });
+    
+    button.dataset.listenerAttached = 'true';
+  });
+}
+//
+
+//
+export async function loadCartPage() {
+  const tableBody = document.getElementById('cart-table-body');
 
   if (!tableBody) return; 
 
@@ -43,56 +151,8 @@ export async function loadCartPage() {
     }
 
     const data = await res.json();
-    const items = data.items;
-    const meta = data.meta;
-
-    if (items.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
-      subtotalEl.textContent = '$0.00';
-      totalEl.textContent = '$0.00';
-      return;
-    }
-
-    tableBody.innerHTML = items.map(item => {
-      const price = Number(item.variant.price);
-      const total = price * item.quantity;
-      const coffeeName = item.variant.coffee.name;
-      const image = item.variant.coffee.image || 'images/menu-1.jpg';
-      const weight = item.variant.weight;
-
-      return `
-        <tr class="text-center" data-cart-item-id="${item.id}">
-          <td class="product-remove">
-            <a href="#" class="remove-btn" data-id="${item.id}"><span class="icon-close"></span></a>
-          </td>
-          
-          <td class="image-prod">
-            <div class="img" style="background-image: url(${image});"></div>
-          </td>
-          
-          <td class="product-name">
-            <h3>${coffeeName}</h3>
-            <p>${weight}g Package</p>
-          </td>
-          
-          <td class="price">$${price.toFixed(2)}</td>
-          
-          <td class="quantity">
-            <div class="input-group mb-3">
-              <input type="text" name="quantity" 
-                     class="quantity form-control input-number" 
-                     value="${item.quantity}" min="1" max="100" readonly>
-            </div>
-          </td>
-          
-          <td class="total">$${total.toFixed(2)}</td>
-        </tr>
-      `;
-    }).join('');
-
-    const grandTotalFormatted = `$${Number(meta.grandTotal).toFixed(2)}`;
-    subtotalEl.textContent = grandTotalFormatted;
-    totalEl.textContent = grandTotalFormatted;
+    
+    renderCartTable(data); 
 
   } catch (error) {
     console.error('Error loading cart page:', error);

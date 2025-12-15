@@ -7,7 +7,6 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //implement the logic for guest user's cart
   @ManyToOne(() => User, (user) => user.cartItems)
   user: User;
 

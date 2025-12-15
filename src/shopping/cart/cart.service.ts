@@ -90,5 +90,58 @@ export class CartService {
     });
   }
 
-  // other methods to be added (update cart and ...)
+  async update(
+    authIdentifier: { userId?: number; guestId?: string },
+    itemId: number,
+    quantity: number, //new total
+  ): Promise<any> {
+    const ownershipWhere = authIdentifier.userId
+      ? { user: { id: authIdentifier.userId } }
+      : { guestId: authIdentifier.guestId };
+
+    const cartItem = await this.cartRepository.findOne({
+      where: { id: itemId, ...ownershipWhere },
+      relations: ['variant'],
+    });
+
+    if (!cartItem) {
+      throw new NotFoundException(`Cart item #${itemId} not found`);
+    }
+
+    if (quantity > cartItem.variant.inStock) {
+      throw new BadRequestException(
+        `Sorry, only ${cartItem.variant.inStock} left in stock.`,
+      );
+    }
+
+    cartItem.quantity = quantity;
+    await this.cartRepository.save(cartItem);
+
+    return this.getCart(authIdentifier);
+  }
+
+  async remove(
+    authIdentifier: { userId?: number; guestId?: string },
+    itemId: number,
+  ): Promise<any> {
+    // Returns the updated cart
+    const ownershipWhere = authIdentifier.userId
+      ? { user: { id: authIdentifier.userId } }
+      : { guestId: authIdentifier.guestId };
+
+    const cartItem = await this.cartRepository.findOne({
+      where: {
+        id: itemId,
+        ...ownershipWhere,
+      },
+    });
+
+    if (!cartItem) {
+      throw new NotFoundException(`Cart item #${itemId} not found`);
+    }
+
+    await this.cartRepository.remove(cartItem);
+
+    return this.getCart(authIdentifier);
+  }
 }

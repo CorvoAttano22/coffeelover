@@ -69,7 +69,6 @@ export class CoffeesService {
       this.variantRepository.create({
         weight: v.weight,
         price: v.price,
-        inStock: v.inStock ?? true,
         coffee,
       }),
     );
@@ -130,7 +129,6 @@ export class CoffeesService {
               id: v.id,
               weight: v.weight,
               price: v.price,
-              inStock: v.inStock ?? true,
               coffee: coffee,
             });
             if (!existingVariant) {
@@ -141,7 +139,6 @@ export class CoffeesService {
             return this.variantRepository.create({
               weight: v.weight,
               price: v.price,
-              inStock: v.inStock ?? true,
               coffee: coffee,
             });
           }

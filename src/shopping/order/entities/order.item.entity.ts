@@ -14,9 +14,18 @@ export class OrderItem {
 
   @ManyToOne(() => Order, (order) => order.items)
   order: Order;
+  
+  @Column()
+  variantId: number;
 
-  @ManyToOne(() => CoffeeVariant, { eager: true })
+  @ManyToOne(() => CoffeeVariant, { eager: true }) // You can remove eager if not needed elsewhere
   variant: CoffeeVariant;
+  
+  @Column()
+  productName: string;
+
+  @Column()
+  variantDescription: string;
 
   @Column({ type: 'int' })
   quantity: number;

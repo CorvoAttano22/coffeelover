@@ -28,7 +28,6 @@ const GUEST_ID_COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
 };
 
-@Auth(AuthType.Bearer)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -52,7 +51,6 @@ export class CartController {
     return { guestId };
   }
 
-  @Auth(AuthType.None)
   @Post()
   async addToCart(
     @Body() addCartItemDto: AddCartItemDto,
@@ -81,7 +79,6 @@ export class CartController {
     };
   }
 
-  @Auth(AuthType.None)
   @Get()
   async getCart(
     @ActiveUser() user: ActiveUserData,
@@ -112,25 +109,41 @@ export class CartController {
   @Patch(':id')
   async updateQuantity(
     @Param('id', ParseIntPipe) cartItemId: number,
-    @Body() updateDto: UpdateCartDto,
+    @Body('quantity', ParseIntPipe) quantity: number,
     @ActiveUser() user: ActiveUserData,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const authIdentifier = this.getAuthIdentifier(req, res, user);
-    // You'll need to implement a service method for this
-    // return this.cartService.updateQuantity(authIdentifier, cartItemId, updateDto.quantity);
+    return this.cartService.update(authIdentifier, cartItemId, quantity);
   }
 
   @Delete(':id')
-  async removeItem(
-    @Param('id', ParseIntPipe) cartItemId: number,
+  async removeFromCart(
+    @Param('id', ParseIntPipe) itemId: number,
     @ActiveUser() user: ActiveUserData,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const authIdentifier = this.getAuthIdentifier(req, res, user);
-    // You'll need to implement a service method for this
-    // return this.cartService.removeFromCart(authIdentifier, cartItemId);
+
+    const cartItems = await this.cartService.remove(authIdentifier, itemId);
+
+    const grandTotal = cartItems.reduce((sum, item) => {
+      return sum + Number(item.variant.price) * item.quantity;
+    }, 0);
+
+    const totalQuantity = cartItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    );
+
+    return {
+      items: cartItems,
+      meta: {
+        grandTotal,
+        totalQuantity,
+      },
+    };
   }
 }
