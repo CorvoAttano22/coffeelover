@@ -18,7 +18,6 @@ import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
 import { Request, Response } from 'express';
 import * as crypto from 'crypto';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 
 //Guest Cart Management
 const GUEST_ID_COOKIE_NAME = 'guestId';

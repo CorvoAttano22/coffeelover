@@ -17,6 +17,9 @@ import { ActiveUser } from 'src/iam/decorators/active-user.decorator';
 import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
 import { Auth } from 'src/iam/decorators/auth.decorator';
 import { AuthType } from 'src/iam/enums/auth-type.enum';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from 'src/iam/authorization/decorators/roles.decorator';
+import { Role } from 'src/users/enums/role.enum';
 
 @Controller('coffees')
 export class CoffeesController {
@@ -28,7 +31,6 @@ export class CoffeesController {
     @ActiveUser() user: ActiveUserData,
   ) {
     // const { limit, offset } = paginationQuery;
-    console.log(user);
     return this.coffeeService.findAll(paginationQuery);
   }
 
@@ -41,7 +43,9 @@ export class CoffeesController {
     return coffee;
   }
 
-  // @Roles(Role.Admin)
+
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Auth(AuthType.Bearer)
   @Post()
   create(@Body() createCoffeeDto: CreateCoffeeDto) {
@@ -49,14 +53,16 @@ export class CoffeesController {
     return this.coffeeService.create(createCoffeeDto);
   }
 
-  // @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Auth(AuthType.Bearer)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCoffeeDto: UpdateCoffeeDto) {
     return this.coffeeService.update(id, updateCoffeeDto);
   }
 
-  // @Roles(Role.Admin)
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Auth(AuthType.Bearer)
   @Delete(':id')
   remove(@Param('id') id: string) {

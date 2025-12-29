@@ -1,15 +1,18 @@
-// src/orders/dto/create-order.dto.ts
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateOrderDto {
+  @ApiProperty({ example: 'John', description: 'Customer first name' })
   @IsNotEmpty()
   @IsString()
   firstName: string;
 
+  @ApiProperty({ example: 'Doe', description: 'Customer last name' })
   @IsNotEmpty()
   @IsString()
   lastName: string;
 
+  @ApiProperty({ example: '123 Coffee Lane', description: 'Shipping street address' })
   @IsNotEmpty()
   @IsString()
   street: string;
@@ -24,7 +27,7 @@ export class CreateOrderDto {
 
   @IsNotEmpty()
   @IsString()
-  state: string; // "Country/State" in your form
+  state: string;
 
   @IsNotEmpty()
   @IsString()

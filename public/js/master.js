@@ -5,26 +5,31 @@ import { loadAllCoffees, loadProductDetail } from './product.js';
 
 async function loadGlobalComponents() {
   try {
-    const res = await fetch('navbar.html');
-    const html = await res.text();
-    const path = window.location.pathname;
-
+    const navRes = await fetch('navbar.html');
+    const navHtml = await navRes.text();
     const navbarPlaceholder = document.getElementById('navbar-placeholder');
+
     if (navbarPlaceholder) {
-      navbarPlaceholder.innerHTML = html;
-      
+      navbarPlaceholder.innerHTML = navHtml;
+
       initializeCartFeatures();
       checkUserStatus();
       setupLogoutHandler();
 
+      const footerRes = await fetch('footer.html');
+      const footerHtml = await footerRes.text();
+      const footerPlaceholder = document.getElementById('footer-placeholder');
+
+      if (footerPlaceholder) {
+        footerPlaceholder.innerHTML = footerHtml;
+      }
+
       if (window.location.pathname.endsWith('/cart.html')) {
         await loadCartPage();
-      }
-      else if (window.location.pathname.endsWith('/menu.html')) {
-        await loadAllCoffees()
-      }
-      else if (window.location.pathname.endsWith('/product-single.html')) {
-        await loadProductDetail()
+      } else if (window.location.pathname.endsWith('/menu.html')) {
+        await loadAllCoffees();
+      } else if (window.location.pathname.endsWith('/product-single.html')) {
+        await loadProductDetail();
       }
     }
   } catch (err) {

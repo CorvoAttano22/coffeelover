@@ -154,7 +154,7 @@ export class CoffeesService {
     return this.coffeeRepository.remove(coffee);
   }
 
-  //to be understood
+  //
   async recommendCoffee(coffee: Coffee) {
     const queryRunner = this.connection.createQueryRunner();
 

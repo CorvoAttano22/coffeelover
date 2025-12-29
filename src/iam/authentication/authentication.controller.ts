@@ -19,6 +19,7 @@ import { ConfigType } from '@nestjs/config';
 import jwtConfig from '../config/jwt.config';
 import { ActiveUser } from '../decorators/active-user.decorator';
 import { ActiveUserData } from '../interfaces/active-user-data.interface';
+import { ApiBearerAuth } from '@nestjs/swagger';
 @Auth(AuthType.None)
 @Controller('authentication')
 export class AuthenticationController {
@@ -64,6 +65,7 @@ export class AuthenticationController {
     };
   }
 
+  @ApiBearerAuth()
   @Auth(AuthType.Bearer)
   @Post('logout')
   async logout(
@@ -78,13 +80,14 @@ export class AuthenticationController {
       secure: process.env.NODE_ENV === 'production',
     });
   }
-
+  
   @HttpCode(HttpStatus.OK)
   @Post('refresh-tokens')
   refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshTokens(refreshTokenDto);
   }
 
+  @ApiBearerAuth()
   @Auth(AuthType.Bearer)
   @Get('me')
   getProfile(@ActiveUser() user: ActiveUserData) {

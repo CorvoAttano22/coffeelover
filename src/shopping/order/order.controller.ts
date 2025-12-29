@@ -6,7 +6,9 @@ import { StripeService } from './stripe.service';
 import { OrderService } from './order.service';
 import { Auth } from 'src/iam/decorators/auth.decorator';
 import { AuthType } from 'src/iam/enums/auth-type.enum';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Auth(AuthType.Bearer)
 @Controller('orders')
 export class OrderController {
@@ -16,6 +18,23 @@ export class OrderController {
   ) {}
 
   @Post('checkout')
+  @ApiOperation({
+    summary: 'Create a Stripe Checkout Session',
+    description:
+      'Validates stock, creates a pending order, and returns a Stripe URL.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The order was successfully created.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Stock insufficient or invalid data.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Token missing or invalid.',
+  })
   async checkout(
     @ActiveUser() user: ActiveUserData,
     @Body() createOrderDto: CreateOrderDto,
