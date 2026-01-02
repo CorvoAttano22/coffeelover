@@ -19,13 +19,21 @@ import { OrderModule } from './shopping/order/order.module';
     CoffeesModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
+      url: process.env.DATABASE_URL,
       host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
+      port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
+
       autoLoadEntities: true,
       synchronize: true, //true is notForProduction
+
+      ssl: process.env.DATABASE_URL
+        ? {
+            rejectUnauthorized: false,
+          }
+        : false,
     }),
     UsersModule,
     IamModule,
