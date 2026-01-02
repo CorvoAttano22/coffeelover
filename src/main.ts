@@ -8,7 +8,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    rawBody: true
+    rawBody: true,
   });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,16 +25,19 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const config = new DocumentBuilder()
-  .setTitle('Coffee Shop API')
-  .setDescription('Coffee for all tastes!')
-  .setVersion('1.0')
-  .addBearerAuth()
-  .build()
+    .setTitle('Coffee Shop API')
+    .setDescription('Coffee for all tastes!')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api/docs', app, document)
-  
-  await app.listen(process.env.PORT ?? 3000);
+  SwaggerModule.setup('/api/docs', app, document);
+
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap();
